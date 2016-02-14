@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 
-// $Revision: 3393 $ $Date:: 2016-02-10 #$ $Author: serge $
+// $Revision: 3409 $ $Date:: 2016-02-13 #$ $Author: serge $
 
 #ifndef SYNC_SCHED_SCHEDULER_T_H
 #define SYNC_SCHED_SCHEDULER_T_H
@@ -36,16 +36,17 @@ class SchedulerT
 {
 public:
 
-    typedef typename _BASE Impl;
-
 private:
     typedef std::vector<_EVENT>             EventsList;
 
     typedef std::map<_TIMEVAR, EventsList>  MapTimeToEvents;
 
+    typedef typename MapTimeToEvents::value_type    PairTimeEvent;
+
 public:
 
-    SchedulerT():
+    SchedulerT( _BASE & base ):
+        base_( base ),
         has_next_time_( false )
     {
     }
@@ -73,7 +74,7 @@ public:
 
             for( auto & ev : l )
             {
-                Impl::on_event( time, ev );
+                base_.on_event( time, ev );
             }
 
             events_.erase( it );
@@ -99,7 +100,7 @@ public:
 
             l.push_back( event );
 
-            events_.insert( MapTimeToEvents::value_type( time, l ) );
+            events_.insert( PairTimeEvent( time, l ) );
 
             if( has_next_time_ )
             {
@@ -123,6 +124,7 @@ public:
 
 private:
 
+    _BASE           & base_;
     bool            has_next_time_;
     _TIMEVAR        next_time_;
     MapTimeToEvents events_;
