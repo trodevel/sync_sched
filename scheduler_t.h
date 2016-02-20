@@ -20,7 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 
-// $Revision: 3424 $ $Date:: 2016-02-17 #$ $Author: serge $
+// $Revision: 3435 $ $Date:: 2016-02-19 #$ $Author: serge $
 
 #ifndef SYNC_SCHED_SCHEDULER_T_H
 #define SYNC_SCHED_SCHEDULER_T_H
@@ -48,14 +48,21 @@ public:
     SchedulerT( _BASE & base ):
         base_( base ),
         has_next_time_( false ),
-        last_time_( 0 )
+        has_last_time_( false )
     {
     }
 
     void iterate( _TIMEVAR time )
     {
-        if( time <= last_time_ )
-            throw std::logic_error( "iterate: time iterated twice" );
+        if( has_last_time_ )
+        {
+            if( time <= last_time_ )
+                throw std::logic_error( "iterate: time iterated twice" );
+        }
+        else
+        {
+            has_last_time_  = true;
+        }
 
         last_time_ = time;
 
@@ -133,6 +140,7 @@ private:
 
     _BASE           & base_;
     bool            has_next_time_;
+    bool            has_last_time_;
     _TIMEVAR        next_time_;
     _TIMEVAR        last_time_;
     MapTimeToEvents events_;
